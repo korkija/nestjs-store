@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
@@ -7,8 +8,9 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import * as methodOverride from 'method-override';
 import * as cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
 const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
+const MongoStore = require('connect-mongo');
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -17,23 +19,17 @@ async function bootstrap() {
   app.use(methodOverride('_method'));
   app.use(cookieParser());
 
-  const options = {
-    connectionLimit: 10,
-    port: 3306,
-    host: 'localhost',
-    database: 'nestmysql',
-    user: 'root',
-    password: '',
-    createDatabaseTable: true,
-  };
-  const sessionStore = new MySQLStore(options);
+  const dbString = 'mongodb://localhost:27017/mystore-mongodb';
 
   app.use(
     session({
       secret: 'It is a secret',
       resave: false,
       saveUninitialized: false,
-      store: sessionStore,
+      store: MongoStore.create({
+        mongooseConnection: mongoose.connection,
+        mongoUrl: dbString,
+      }),
     }),
   );
   app.setViewEngine('ejs');

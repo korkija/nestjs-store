@@ -1,21 +1,15 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-} from 'typeorm';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Entity('users')
+@Schema({ timestamps: true })
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ type: 'varchar', length: 100, unique: true })
+  @Prop()
   username: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Prop()
   password: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);

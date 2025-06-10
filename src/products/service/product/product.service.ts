@@ -1,28 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { ProductDTO } from 'src/DTO/product.dto';
 import { Product } from 'src/entities/entities';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(Product) private productRepository: Repository<Product>,
+    @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
   async addProduct(newProduct: ProductDTO) {
-    const product = this.productRepository.create(newProduct);
-    return await this.productRepository.save(product);
+    const product = new this.productModel(newProduct);
+    return await product.save();
   }
 
   async getAll() {
-    return await this.productRepository.find();
+    return await this.productModel.find();
   }
 
-  async getOne(id: number) {
-    const product = await this.productRepository.findOne({
-      where: { id },
-    });
+  async getOne(id: string) {
+    const product = await this.productModel.findById(id).exec();
 
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
@@ -30,25 +29,21 @@ export class ProductService {
     return product;
   }
 
-  async updateProduct(id: number, updateData: ProductDTO) {
-    const product = await this.productRepository.findOne({
-      where: { id },
-    });
+  async updateProduct(id: string, updateData: ProductDTO) {
+    const product = await this.productModel
+      .findByIdAndUpdate(id, updateData, { new: true })
+      .exec();
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
-    // const updatedProduct = Object.assign(product, updateData);
-    this.productRepository.merge(product, updateData);
-    return await this.productRepository.save(product);
+    return product;
   }
 
-  async deleteProduct(id: number) {
-    const product = await this.productRepository.findOne({
-      where: { id },
-    });
+  async deleteProduct(id: string) {
+    const product = await this.productModel.findByIdAndDelete(id).exec();
     if (!product) {
       throw new NotFoundException(`Product with id ${id} not found`);
     }
-    return await this.productRepository.remove(product);
+    return product;
   }
 }

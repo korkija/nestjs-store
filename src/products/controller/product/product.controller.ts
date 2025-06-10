@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Redirect,
@@ -44,7 +43,7 @@ export class ProductController {
   }
   @Get('getOne/:id')
   @Render('edit-product')
-  async getOne(@Param('id', ParseIntPipe) id: number) {
+  async getOne(@Param('id') id: string) {
     const product = await this.productService.getOne(id);
     return { product };
   }
@@ -62,7 +61,7 @@ export class ProductController {
     }),
   )
   async updateProduct(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateData: ProductDTO,
     @UploadedFile() file: Express.Multer.File,
   ) {
@@ -74,7 +73,7 @@ export class ProductController {
 
   @Delete('delete/:id')
   @Redirect('/mystore/home')
-  async deleteProduct(@Param('id', ParseIntPipe) id: number) {
+  async deleteProduct(@Param('id') id: string) {
     await this.productService.deleteProduct(id);
     return 'Product deleted successfully';
   }

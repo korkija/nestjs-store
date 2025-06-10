@@ -1,24 +1,18 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-@Entity({ name: 'products' })
+@Schema({ timestamps: true })
 export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column('varchar', { nullable: false, length: 100 })
+  @Prop({ require: true })
   productname: string;
 
-  @Column('decimal', { nullable: false, precision: 10 })
+  @Prop({ require: true })
   price: number;
 
-  @Column('varchar', { nullable: false, length: 255 })
+  @Prop({ require: true })
   image: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
+
+export const ProductSchema = SchemaFactory.createForClass(Product);
